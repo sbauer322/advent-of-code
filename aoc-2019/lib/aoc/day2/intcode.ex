@@ -1,5 +1,4 @@
 defmodule AOC.Day2.Intcode do
-
   @moduledoc false
 
   @type memory :: %{integer => integer}

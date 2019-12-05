@@ -1,5 +1,4 @@
 defmodule AOC.Day1.FuelEquation do
-
   @moduledoc false
 
   def part1() do
