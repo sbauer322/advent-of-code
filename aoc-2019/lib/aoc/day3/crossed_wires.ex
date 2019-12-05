@@ -38,7 +38,7 @@ defmodule AOC.Day3.CrossedWires do
     end)
   end
 
-  @spec process_wire_input(list(String.t)) :: list({atom, integer})
+  @spec process_wire_input(list(String.t())) :: list({atom, integer})
   def process_wire_input(wire) do
     wire
     |> Enum.map(fn vector ->
