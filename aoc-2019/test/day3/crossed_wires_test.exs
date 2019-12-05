@@ -25,8 +25,11 @@ defmodule AOC.Day3.CrossedWiresTest do
     assert expected == result
   end
 
-  #
-  #  test "part 1" do
-  #
-  #  end
+
+  test "part 1" do
+    expected = 2050
+    result = CrossedWires.part1()
+
+    assert expected == result
+  end
 end
