@@ -1,12 +1,13 @@
 defmodule AOC.Day3.CrossedWires do
+
+  @moduledoc false
+
   def part1() do
     [w1, w2] =
       stream_input("./resources/day3_part1_input.txt")
       |> process_input()
 
-    find_intersections(w1, w2)
-    |> Enum.min_by(&manhattan_distance(&1, {0, 0}))
-    |> manhattan_distance({0, 0})
+    compute_part1(w1, w2)
   end
 
   def part2() do
@@ -27,6 +28,12 @@ defmodule AOC.Day3.CrossedWires do
       |> process_wire_input()
       |> points()
     end)
+  end
+
+  def compute_part1(w1, w2) do
+    find_intersections(w1, w2)
+    |> Enum.min_by(&manhattan_distance(&1, {0, 0}))
+    |> manhattan_distance({0, 0})
   end
 
   def process_wire_input(wire) do

@@ -1,4 +1,7 @@
 defmodule AOC.Day1.FuelEquation do
+
+  @moduledoc false
+
   def part1() do
     stream_input("./resources/day1_part1_input.txt")
     |> total_fuel(:simple)
