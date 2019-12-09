@@ -2,11 +2,11 @@ defmodule AOC.Day5.Intcode do
   @moduledoc false
 
   @type memory :: %{
-                    integer => integer,
-                    pointer: integer,
-                    inputs: list(integer),
-                    outputs: list(integer)
-                  }
+          integer => integer,
+          pointer: integer,
+          inputs: list(integer),
+          outputs: list(integer)
+        }
 
   def part1(path, user_inputs) do
     stream_puzzle_input(path)
@@ -34,9 +34,9 @@ defmodule AOC.Day5.Intcode do
       {index, String.to_integer(value)}
     end)
     |> Map.new()
-    |> (&(Map.put(&1, :pointer, 0))).()
-    |> (&(Map.put(&1, :inputs, user_input))).()
-    |> (&(Map.put(&1, :outputs, []))).()
+    |> (&Map.put(&1, :pointer, 0)).()
+    |> (&Map.put(&1, :inputs, user_input)).()
+    |> (&Map.put(&1, :outputs, [])).()
   end
 
   @spec brute_force(memory, integer, integer, integer) :: {integer, integer} | :error
@@ -76,10 +76,13 @@ defmodule AOC.Day5.Intcode do
 
   def process_address(memory) do
     address = read_instruction_pointer(memory)
-    {parameter_modes, op} = read(memory, address)
-                            |> Integer.digits()
-                            |> Enum.split(-2)
-    padding = Enum.take([0,0,0,0,0,0], 5 - length(parameter_modes))
+
+    {parameter_modes, op} =
+      read(memory, address)
+      |> Integer.digits()
+      |> Enum.split(-2)
+
+    padding = Enum.take([0, 0, 0, 0, 0, 0], 5 - length(parameter_modes))
     parameter_modes = Enum.reverse(parameter_modes) ++ padding
     op = Integer.undigits(op)
     {parameter_modes, op}
@@ -158,67 +161,42 @@ defmodule AOC.Day5.Intcode do
 
   @spec instruction(memory, integer) :: {(... -> memory) | :error, integer}
   def instruction(_memory, opcode) do
-    cond do
-      opcode == 1 ->
-        func = &add/4
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
+    instructions = %{
+      1 => &add/4,
+      2 => &multiply/4,
+      3 => &input/2,
+      4 => &output/2,
+      5 => &jump_if_true/3,
+      6 => &jump_if_false/3,
+      7 => &less_than/4,
+      8 => &equals/4,
+      99 => &terminate/1
+    }
 
-      opcode == 2 ->
-        func = &multiply/4
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
+    func = Map.get(instructions, opcode)
 
-      opcode == 3 ->
-        func = &input/2
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 4 ->
-        func = &output/2
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 5 ->
-        func = &jump_if_true/3
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 6 ->
-        func = &jump_if_false/3
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 7 ->
-        func = &less_than/4
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 8 ->
-        func = &equals/4
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      opcode == 99 ->
-        func = &terminate/1
-        {:arity, num_params} = Function.info(func, :arity)
-        {func, num_params}
-
-      true ->
-        :error
+    if func == nil do
+      :error
+    else
+      {:arity, num_params} = Function.info(func, :arity)
+      {func, num_params}
     end
   end
 
-  @spec add({memory, integer}, {integer, integer}, {integer, integer}, {integer, integer}) :: memory
+  @spec add({memory, integer}, {integer, integer}, {integer, integer}, {integer, integer}) ::
+          memory
   def add({memory, num_params}, param_and_mode1, param_and_mode2, {param3, 0}) do
     value = read(memory, param_and_mode1) + read(memory, param_and_mode2)
+
     update(memory, param3, value)
     |> increment_instruction_pointer(num_params)
   end
 
-  @spec multiply({memory, integer}, {integer, integer}, {integer, integer}, {integer, integer}) :: memory
+  @spec multiply({memory, integer}, {integer, integer}, {integer, integer}, {integer, integer}) ::
+          memory
   def multiply({memory, num_params}, param_and_mode1, param_and_mode2, {param3, 0}) do
     value = read(memory, param_and_mode1) * read(memory, param_and_mode2)
+
     update(memory, param3, value)
     |> increment_instruction_pointer(num_params)
   end
@@ -226,6 +204,7 @@ defmodule AOC.Day5.Intcode do
   @spec input({memory, integer}, {integer, integer}) :: memory
   def input({memory, num_params}, {param1, 0}) do
     {value, memory} = pop_input(memory)
+
     update(memory, param1, value)
     |> increment_instruction_pointer(num_params)
   end
@@ -233,8 +212,8 @@ defmodule AOC.Day5.Intcode do
   @spec output({memory, integer}, {integer, integer}) :: memory
   def output({memory, num_params}, param1) do
     read(memory, param1)
-  #    |> (&(IO.puts("Output: #{&1}"))).()
-    |> (&(push_output(memory, &1))).()
+    #    |> (&(IO.puts("Output: #{&1}"))).()
+    |> (&push_output(memory, &1)).()
     |> increment_instruction_pointer(num_params)
   end
 
@@ -242,7 +221,7 @@ defmodule AOC.Day5.Intcode do
     v1 = read(memory, param_and_mode1)
     v2 = read(memory, param_and_mode2)
 
-    if (v1 != 0) do
+    if v1 != 0 do
       update_instruction_pointer(memory, v2)
     else
       increment_instruction_pointer(memory, num_params)
@@ -253,7 +232,7 @@ defmodule AOC.Day5.Intcode do
     v1 = read(memory, param_and_mode1)
     v2 = read(memory, param_and_mode2)
 
-    if (v1 == 0) do
+    if v1 == 0 do
       update_instruction_pointer(memory, v2)
     else
       increment_instruction_pointer(memory, num_params)
@@ -264,7 +243,7 @@ defmodule AOC.Day5.Intcode do
     v1 = read(memory, param_and_mode1)
     v2 = read(memory, param_and_mode2)
 
-    if (v1 < v2) do
+    if v1 < v2 do
       update(memory, param3, 1)
     else
       update(memory, param3, 0)
@@ -276,7 +255,7 @@ defmodule AOC.Day5.Intcode do
     v1 = read(memory, param_and_mode1)
     v2 = read(memory, param_and_mode2)
 
-    if (v1 == v2) do
+    if v1 == v2 do
       update(memory, param3, 1)
     else
       update(memory, param3, 0)
