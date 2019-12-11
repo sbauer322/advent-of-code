@@ -11,8 +11,7 @@ defmodule AOC.Day6.OrbitChecksumTest do
     result =
       input
       |> OrbitChecksum.process_input()
-      |> OrbitChecksum.parent_to_child_map()
-      |> OrbitChecksum.invert_flatten_map()
+      |> OrbitChecksum.child_to_parent_map()
       |> OrbitChecksum.checksum()
 
     assert 42 == result
