@@ -1,4 +1,6 @@
 defmodule AOC.Day4.SecureContainer do
+  @moduledoc false
+
   @input_min 134_792
   @input_max 675_810
 

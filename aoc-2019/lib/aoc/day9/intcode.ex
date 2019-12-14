@@ -4,6 +4,7 @@ defmodule AOC.Day9.Intcode do
   @type memory :: %{
           integer => integer,
           pointer: integer,
+          relative_base: integer,
           inputs: list(integer),
           outputs: list(integer)
         }
@@ -257,7 +258,7 @@ defmodule AOC.Day9.Intcode do
     Map.put(memory, :outputs, [value | outputs])
   end
 
-  @spec update(memory, integer, integer) :: memory
+  @spec update(memory, {integer, integer}, integer) :: memory
   def update(memory, {address, mode}, value) do
     case mode do
       0 -> Map.put(memory, address, value)
@@ -327,6 +328,8 @@ defmodule AOC.Day9.Intcode do
     memory =
       push_output(memory, value)
       |> increment_instruction_pointer(num_params)
+
+    {:waiting, memory}
   end
 
   def jump_if_true({memory, num_params}, param_and_mode1, param_and_mode2) do

@@ -235,7 +235,7 @@ defmodule AOC.Day7.IntcodeTest do
   test "thruster signal max 54321" do
     puzzle_input = ~w(3 23 3 24 1002 24 10 24 1002 23 -1 23 101 5 23 23 1 24 23 23 4 23 99 0 0)
     output = Intcode.amplifiers(puzzle_input)
-    assert {[0, 1, 2, 3, 4], 54321} == output
+    assert {[0, 1, 2, 3, 4], 54_321} == output
   end
 
   test "thruster signal max 65210" do
@@ -243,7 +243,7 @@ defmodule AOC.Day7.IntcodeTest do
       ~w(3 31 3 32 1002 32 10 32 1001 31 -2 31 1007 31 0 33 1002 33 7 33 1 33 31 31 1 32 31 31 4 31 99 0 0 0)
 
     output = Intcode.amplifiers(puzzle_input)
-    assert {[1, 0, 4, 3, 2], 65210} == output
+    assert {[1, 0, 4, 3, 2], 65_210} == output
   end
 
   test "feedback loop max thruster signal 139629729" do

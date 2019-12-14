@@ -1,6 +1,8 @@
 defmodule AOC.Day10.MonitoringStation do
   @moduledoc false
 
+  @type point :: {integer, integer}
+
   def read_puzzle_input(path) do
     File.read!(path)
   end
@@ -15,14 +17,15 @@ defmodule AOC.Day10.MonitoringStation do
       process_input(input)
       |> vaporize_all(origin)
 
-    if result == nil do
-      nil
-    else
+    if result != nil do
       {x, y} = result
       x * 100 + y
+    else
+      nil
     end
   end
 
+  @spec process_input(String.t()) :: list(point)
   def process_input(input) do
     input
     |> String.trim()
@@ -42,6 +45,7 @@ defmodule AOC.Day10.MonitoringStation do
     end)
   end
 
+  @spec find_best_station_location(list(point)) :: {point, integer}
   def find_best_station_location(positions) do
     positions
     |> Enum.reduce({nil, 0}, fn pos, {current, total} ->
@@ -55,11 +59,13 @@ defmodule AOC.Day10.MonitoringStation do
     end)
   end
 
+  @spec detect_asteroids(list(point), point) :: %{float => list(point)}
   def detect_asteroids(positions, origin) do
     build_position_angle_map(positions, origin)
     |> Enum.group_by(fn {_key, value} -> value end, fn {key, _value} -> key end)
   end
 
+  @spec build_position_angle_map(list(point), point) :: %{point => float}
   def build_position_angle_map(positions, {x0, y0}) do
     positions
     |> Enum.reduce(%{}, fn {x1, y1}, acc ->
@@ -71,6 +77,7 @@ defmodule AOC.Day10.MonitoringStation do
     end)
   end
 
+  @spec count_closest_asteroids(%{float => list(point)}, point) :: {point, integer}
   def count_closest_asteroids(angle_position_map, origin) do
     angle_position_map
     |> Map.values()
@@ -82,12 +89,14 @@ defmodule AOC.Day10.MonitoringStation do
     |> (&{origin, length(&1)}).()
   end
 
+  @spec vaporize_all(list(point), point) :: integer | nil
   def vaporize_all(positions, origin) do
     clockwise = asteroids_by_clockwise_and_nearest(positions, origin)
     total_cycle = length(clockwise)
     vaporize(clockwise, 0, 0)
   end
 
+  @spec vaporize(list(list(point)), integer, integer) :: point | nil
   def vaporize([], current, removed) do
     nil
   end
@@ -116,6 +125,7 @@ defmodule AOC.Day10.MonitoringStation do
     end
   end
 
+  @spec asteroids_by_clockwise_and_nearest(list(point), point) :: list(list(point))
   def asteroids_by_clockwise_and_nearest(positions, origin) do
     angle_position_map =
       build_position_angle_map(positions, origin)
@@ -132,13 +142,14 @@ defmodule AOC.Day10.MonitoringStation do
     left ++ right
   end
 
-  @spec manhattan_distance({integer, integer}, {integer, integer}) :: non_neg_integer
+  @spec manhattan_distance(point, point) :: non_neg_integer
   def manhattan_distance({x1, y1}, {x2, y2}) do
     abs(y1 - y2) + abs(x1 - x2)
   end
 
-  def wrap_angles_clockwise(angle_position_map, origin) do
-    Enum.map(angle_position_map, fn {angle, points} ->
+  @spec wrap_angles_clockwise(list({float, list(point)}), point) :: list(list(point))
+  def wrap_angles_clockwise(angle_positions, origin) do
+    Enum.map(angle_positions, fn {angle, points} ->
       points =
         points
         |> List.delete(origin)

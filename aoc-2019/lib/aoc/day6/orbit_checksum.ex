@@ -17,7 +17,7 @@ defmodule AOC.Day6.OrbitChecksum do
     |> neighbor_map()
     |> depth_first_search("YOU", "SAN")
     |> node_to_path()
-      # Remove "YOU", "SAN", and the starting object
+    # Remove "YOU", "SAN", and the starting object
     |> (&(length(&1) - 3)).()
   end
 
