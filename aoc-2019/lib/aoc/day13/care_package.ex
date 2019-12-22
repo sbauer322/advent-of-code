@@ -43,8 +43,8 @@ defmodule AOC.Day13.CarePackage do
         :error_compute
 
       {:terminate, memory} ->
-          {outputs, memory} = Intcode.empty_outputs(memory)
-          {outputs, grid, score}
+        {outputs, memory} = Intcode.empty_outputs(memory)
+        {outputs, grid, score}
     end
   end
 
