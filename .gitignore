@@ -1,3 +1,9 @@
 *.iml
 
 .idea/
+
+aoc-2018/.DS_Store
+
+.DS_Store
+
+aoc-2018/out/
